@@ -13,13 +13,16 @@ const getTodoModel = async () => {
 // post all properties
 const createTodoModel = async (title, notes, dueDate, priority, isChecked) => {
   // console.log('createTodoModel : >>>>>>>>', title, notes, dueDate, priority, isChecked)
-  const todo = {title, notes, dueDate, priority, isChecked}
+  const todo = {title, notes, due_date:dueDate, priority, is_checked:isChecked}
   console.log('createTodoModel: todo ', todo)
   const result = await collection.insertOne(todo)
-
+  
   console.log('createTodoModel: result ', result)
   if (!result.acknowledged) throw new Error('Failed to create todo') 
-  return result
+
+  const document = await collection.find({"_id":new ObjectId(result.insertedId)}).toArray()
+  console.log('createTodoModel: document ', document)
+  return document
 }
 
 // change for update
@@ -32,7 +35,11 @@ const updateTodoModel = async (id, title, notes, dueDate, priority, isChecked) =
 );
 console.log('updateTodoModel:  result', result)
   if(result.modifiedCount === 0) throw new Error('Failed to update todo') //
-  return result
+
+  const document = await collection.find(filter).toArray()
+  console.log('updateTodoModel: document ', document)
+  return document
+
 }
 
 const deleteTodoModel = async (id) => {
